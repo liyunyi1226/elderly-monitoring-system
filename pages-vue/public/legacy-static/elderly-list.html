@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老年人列表 - 老年人监护系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 500px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #1e3c72;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2a5298;
+        }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        td {
+            color: #666;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1e3c72;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 10px;
+        }
+        .name-cell {
+            display: flex;
+            align-items: center;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background: #1e3c72;
+            color: white;
+            border-color: #1e3c72;
+        }
+        .batch-actions {
+            display: none;
+            background: #e3f2fd;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 15px;
+        }
+        .batch-actions.show {
+            display: flex;
+        }
+        .batch-actions .selected-count {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        .batch-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        .batch-btn-dispatch {
+            background: #ff4757;
+            color: white;
+        }
+        .batch-btn-notify {
+            background: #3498db;
+            color: white;
+        }
+        .batch-btn-checkup {
+            background: #27ae60;
+            color: white;
+        }
+        .batch-btn-export {
+            background: #9b59b6;
+            color: white;
+        }
+        .batch-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .checkbox-cell {
+            width: 40px;
+        }
+        .checkbox-cell input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tab.active {
+            background: #1e3c72;
+            color: white;
+            border-color: #1e3c72;
+        }
+        .filter-tab:hover {
+            border-color: #1e3c72;
+        }
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 {
+            font-size: 28px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 13px;
+            color: #666;
+        }
+        .stat-card.warning h3 {
+            color: #ffa502;
+        }
+        .stat-card.danger h3 {
+            color: #ff4757;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-users"></i> 老年人管理</h1>
+    </div>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3>128</h3>
+                <p>总人数</p>
+            </div>
+            <div class="stat-card">
+                <h3>98</h3>
+                <p>健康良好</p>
+            </div>
+            <div class="stat-card warning">
+                <h3>22</h3>
+                <p>需要关注</p>
+            </div>
+            <div class="stat-card danger">
+                <h3>8</h3>
+                <p>危重状态</p>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" placeholder="搜索姓名、电话或地址...">
+                <button class="btn btn-primary"><i class="fas fa-search"></i> 搜索</button>
+            </div>
+            <button class="btn btn-success"><i class="fas fa-plus"></i> 添加老人</button>
+        </div>
+
+        <div class="filter-tabs">
+            <div class="filter-tab active">全部 (128)</div>
+            <div class="filter-tab">健康良好 (98)</div>
+            <div class="filter-tab">需要关注 (22)</div>
+            <div class="filter-tab">危重状态 (8)</div>
+            <div class="filter-tab">独居老人 (45)</div>
+            <div class="filter-tab">高风险 (15)</div>
+        </div>
+
+        <div class="batch-actions" id="batchActions">
+            <span class="selected-count"><i class="fas fa-check-circle"></i> 已选择 <span id="selectedCount">0</span> 人</span>
+            <button class="batch-btn batch-btn-dispatch" onclick="batchDispatch()">
+                <i class="fas fa-user-md"></i> 批量派医
+            </button>
+            <button class="batch-btn batch-btn-notify" onclick="batchNotify()">
+                <i class="fas fa-bell"></i> 批量通知家属
+            </button>
+            <button class="batch-btn batch-btn-checkup" onclick="batchCheckup()">
+                <i class="fas fa-calendar-check"></i> 批量体检预约
+            </button>
+            <button class="batch-btn batch-btn-export" onclick="batchExport()">
+                <i class="fas fa-file-export"></i> 导出数据
+            </button>
+            <button class="btn btn-sm" style="margin-left: auto; background: #f0f0f0;" onclick="clearSelection()">取消选择</button>
+        </div>
+
+        <div class="card">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell"><input type="checkbox" class="select-all-checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>姓名</th>
+                            <th>年龄</th>
+                            <th>联系电话</th>
+                            <th>地址</th>
+                            <th>健康状态</th>
+                            <th>心率</th>
+                            <th>血压</th>
+                            <th>血氧</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>张大爷</strong>
+                                </div>
+                            </td>
+                            <td>78岁</td>
+                            <td>138****1234</td>
+                            <td>A栋3单元501</td>
+                            <td><span class="status-badge status-critical">危重状态</span></td>
+                            <td style="color: #ff4757; font-weight: 600;">145 bpm</td>
+                            <td>165/95 mmHg</td>
+                            <td style="color: #ff4757; font-weight: 600;">92%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>李奶奶</strong>
+                                </div>
+                            </td>
+                            <td>75岁</td>
+                            <td>139****5678</td>
+                            <td>B栋1单元302</td>
+                            <td><span class="status-badge status-warning">需要关注</span></td>
+                            <td>88 bpm</td>
+                            <td style="color: #ffa502; font-weight: 600;">158/95 mmHg</td>
+                            <td>96%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>王大爷</strong>
+                                </div>
+                            </td>
+                            <td>82岁</td>
+                            <td>137****9012</td>
+                            <td>A栋2单元601</td>
+                            <td><span class="status-badge status-healthy">健康良好</span></td>
+                            <td>72 bpm</td>
+                            <td>125/82 mmHg</td>
+                            <td>98%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>赵奶奶</strong>
+                                </div>
+                            </td>
+                            <td>76岁</td>
+                            <td>136****3456</td>
+                            <td>C栋3单元201</td>
+                            <td><span class="status-badge status-healthy">健康良好</span></td>
+                            <td>68 bpm</td>
+                            <td>118/78 mmHg</td>
+                            <td>99%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>刘大爷</strong>
+                                </div>
+                            </td>
+                            <td>80岁</td>
+                            <td>135****7890</td>
+                            <td>B栋2单元402</td>
+                            <td><span class="status-badge status-warning">需要关注</span></td>
+                            <td style="color: #ffa502; font-weight: 600;">95 bpm</td>
+                            <td style="color: #ffa502; font-weight: 600;">145/88 mmHg</td>
+                            <td>95%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>孙奶奶</strong>
+                                </div>
+                            </td>
+                            <td>73岁</td>
+                            <td>134****1234</td>
+                            <td>A栋1单元101</td>
+                            <td><span class="status-badge status-healthy">健康良好</span></td>
+                            <td>70 bpm</td>
+                            <td>120/80 mmHg</td>
+                            <td>98%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>周大爷</strong>
+                                </div>
+                            </td>
+                            <td>85岁</td>
+                            <td>133****5678</td>
+                            <td>C栋1单元501</td>
+                            <td><span class="status-badge status-critical">危重状态</span></td>
+                            <td style="color: #ff4757; font-weight: 600;">52 bpm</td>
+                            <td style="color: #ff4757; font-weight: 600;">175/100 mmHg</td>
+                            <td style="color: #ff4757; font-weight: 600;">90%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" onchange="updateSelection()"></td>
+                            <td>
+                                <div class="name-cell">
+                                    <div class="avatar"><i class="fas fa-user"></i></div>
+                                    <strong>吴奶奶</strong>
+                                </div>
+                            </td>
+                            <td>77岁</td>
+                            <td>132****9012</td>
+                            <td>B栋3单元301</td>
+                            <td><span class="status-badge status-healthy">健康良好</span></td>
+                            <td>75 bpm</td>
+                            <td>122/80 mmHg</td>
+                            <td>97%</td>
+                            <td>
+                                <a href="elderly-detail.html" class="btn btn-primary btn-sm">详情</a>
+                                <button class="btn btn-danger btn-sm">派医</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button>上一页</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            const count = checkboxes.length;
+            document.getElementById('selectedCount').textContent = count;
+            
+            const batchActions = document.getElementById('batchActions');
+            if (count > 0) {
+                batchActions.classList.add('show');
+            } else {
+                batchActions.classList.remove('show');
+            }
+
+            const selectAll = document.getElementById('selectAll');
+            const allCheckboxes = document.querySelectorAll('.row-checkbox');
+            selectAll.checked = count === allCheckboxes.length && count > 0;
+        }
+
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            updateSelection();
+        }
+
+        async function batchDispatch() {
+            const selectedRows = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => cb.closest('tr'))
+                .filter(Boolean);
+            const count = selectedRows.length;
+            if (!count) return;
+            if (!confirm(`确定要为选中的 ${count} 位老人创建派医工单吗？`)) return;
+
+            try {
+                const elderlyRes = await api.elderly.getList({ pageSize: 100 });
+                const elderlyData = (elderlyRes && elderlyRes.success ? elderlyRes.data.list : []) || [];
+                const doctorsRes = await api.doctors.getList('在线');
+                const doctors = (doctorsRes && doctorsRes.success ? doctorsRes.data : []) || [];
+                if (!doctors.length) {
+                    alert('当前没有在线医生，无法创建派医工单');
+                    return;
+                }
+                const doctorId = doctors[0].id;
+                let successCount = 0;
+                for (const row of selectedRows) {
+                    const name = row.querySelector('.name-cell strong')?.textContent?.trim();
+                    const elderly = elderlyData.find(e => e.name === name);
+                    if (!elderly) continue;
+                    const result = await api.orders.create({
+                        elderly_id: elderly.id,
+                        doctor_id: doctorId,
+                        urgency: '一般',
+                        description: '由老年人列表批量派医创建'
+                    });
+                    if (result.success) successCount += 1;
+                }
+                alert(`已成功创建 ${successCount} 个派医工单`);
+                clearSelection();
+            } catch (error) {
+                console.error('批量派医失败:', error);
+                alert('批量派医失败：' + error.message);
+            }
+        }
+
+        async function dispatchOne(btn) {
+            const row = btn.closest('tr');
+            const name = row?.querySelector('.name-cell strong')?.textContent?.trim();
+            if (!name) return;
+            try {
+                const [elderlyRes, doctorsRes] = await Promise.all([
+                    api.elderly.getList({ pageSize: 100, keyword: name }),
+                    api.doctors.getList('在线')
+                ]);
+                const elderly = (elderlyRes.data.list || []).find(e => e.name === name);
+                const doctor = (doctorsRes.data || [])[0];
+                if (!elderly) return alert('未找到对应老人数据');
+                if (!doctor) return alert('当前无在线医生可派医');
+                const res = await api.orders.create({
+                    elderly_id: elderly.id,
+                    doctor_id: doctor.id,
+                    urgency: '一般',
+                    description: `由老人列表单条派医创建：${name}`
+                });
+                if (res.success) {
+                    alert(`派医成功，工单号：${res.data.order_no}`);
+                }
+            } catch (e) {
+                alert('派医失败：' + e.message);
+            }
+        }
+
+        function batchNotify() {
+            const count = document.getElementById('selectedCount').textContent;
+            if (confirm(`确定要通知选中的 ${count} 位老人的家属吗？`)) {
+                alert(`已向 ${count} 位老人的家属发送通知`);
+                clearSelection();
+            }
+        }
+
+        function batchCheckup() {
+            const count = document.getElementById('selectedCount').textContent;
+            if (confirm(`确定要为选中的 ${count} 位老人预约体检吗？`)) {
+                alert(`已为 ${count} 位老人创建体检预约，请选择体检时间`);
+                clearSelection();
+            }
+        }
+
+        function batchExport() {
+            const count = document.getElementById('selectedCount').textContent;
+            alert(`正在导出 ${count} 位老人的健康数据...`);
+        }
+
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        document.querySelectorAll('button.btn.btn-danger.btn-sm').forEach((btn) => {
+            if (btn.textContent.includes('派医')) {
+                btn.addEventListener('click', () => dispatchOne(btn));
+            }
+        });
+    </script>
+    <script src="js/api.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

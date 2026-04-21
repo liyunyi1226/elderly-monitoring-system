@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生首页 - 老年人监护系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .top-bar {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #3498db;
+        }
+        .user-details h4 { font-size: 15px; margin-bottom: 3px; }
+        .user-details p { font-size: 12px; opacity: 0.8; }
+        .role-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #3498db;
+        }
+        .role-nav {
+            display: flex;
+            gap: 10px;
+        }
+        .role-nav a {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-decoration: none;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        .role-nav a:hover, .role-nav a.active {
+            background: white;
+            color: #667eea;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header p { font-size: 16px; opacity: 0.9; }
+        .permission-notice {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+        .card-icon.blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-icon.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .card-icon.orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .card-icon.red { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+        .card-icon.purple { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .card-icon.teal { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .card-icon.yellow { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .card-icon.ai-blue { background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%); }
+        .card-icon.ai-purple { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .card h3 { color: #333; font-size: 18px; margin-bottom: 8px; }
+        .card p { color: #666; font-size: 13px; line-height: 1.5; }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        .badge.primary { background: #e3f2fd; color: #1976d2; }
+        .badge.success { background: #e8f5e9; color: #388e3c; }
+        .ai-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            margin-top: 10px;
+            font-weight: 500;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .ai-section { margin-top: 35px; margin-bottom: 20px; }
+        .ai-section-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .ai-section-title h2 { font-size: 26px; margin-bottom: 8px; }
+        .ai-section-title p { opacity: 0.9; font-size: 14px; }
+        .ai-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .ai-stat-item { text-align: center; color: white; }
+        .ai-stat-item .number { font-size: 22px; font-weight: bold; }
+        .ai-stat-item .label { font-size: 11px; opacity: 0.8; }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="user-info">
+                <div class="user-avatar"><i class="fas fa-user-md"></i></div>
+                <div class="user-details">
+                    <h4>doctor_zhang</h4>
+                    <p>社区医生</p>
+                </div>
+                <span class="role-badge">医生</span>
+            </div>
+            <div class="role-nav">
+                <a href="index-admin.html">管理员</a>
+                <a href="index-doctor.html" class="active">医生</a>
+                <a href="index-nurse.html">护理员</a>
+                <a href="index-service.html">客服</a>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1><i class="fas fa-heartbeat"></i> 老年人监护系统</h1>
+            <p>社区管理平台 - 医生视角</p>
+        </div>
+
+        <div class="permission-notice">
+            <i class="fas fa-info-circle"></i>
+            <span>当前角色权限：派医工单、健康数据查看、处置记录</span>
+        </div>
+
+        <div class="grid">
+            <a href="dashboard.html" class="card">
+                <div class="card-icon blue"><i class="fas fa-tachometer-alt"></i></div>
+                <h3>控制台</h3>
+                <p>待处理工单、今日预警统计、医生在线状态、设备异常提醒</p>
+                <span class="badge primary">核心页面</span>
+            </a>
+            <a href="elderly-list.html" class="card">
+                <div class="card-icon green"><i class="fas fa-users"></i></div>
+                <h3>老年人列表</h3>
+                <p>老年人信息管理、健康状态查看、批量操作、搜索筛选</p>
+                <span class="badge primary">核心页面</span>
+            </a>
+            <a href="elderly-detail.html" class="card">
+                <div class="card-icon teal"><i class="fas fa-user"></i></div>
+                <h3>老年人详情</h3>
+                <p>个人信息、实时健康数据、家属沟通记录、派医操作</p>
+                <span class="badge primary">核心页面</span>
+            </a>
+            <a href="orders.html" class="card">
+                <div class="card-icon orange"><i class="fas fa-clipboard-list"></i></div>
+                <h3>派医工单</h3>
+                <p>待接单工单、进行中工单、已完成工单、超时未处理工单</p>
+                <span class="badge primary">核心页面</span>
+            </a>
+            <a href="alerts.html" class="card">
+                <div class="card-icon red"><i class="fas fa-bell"></i></div>
+                <h3>警报中心</h3>
+                <p>紧急警报、处理时效统计、警告提醒、快速处理</p>
+                <span class="badge primary">核心页面</span>
+            </a>
+            <a href="monitor.html" class="card">
+                <div class="card-icon purple"><i class="fas fa-desktop"></i></div>
+                <h3>实时监控</h3>
+                <p>实时数据、位置地图、异常记录、动态图表</p>
+                <span class="badge success">辅助页面</span>
+            </a>
+            <a href="reports.html" class="card">
+                <div class="card-icon yellow"><i class="fas fa-chart-bar"></i></div>
+                <h3>数据报告</h3>
+                <p>统计分析、趋势报告、健康排行、数据导出</p>
+                <span class="badge success">辅助页面</span>
+            </a>
+        </div>
+
+        <div class="ai-section">
+            <div class="ai-section-title">
+                <h2><i class="fas fa-robot"></i> AI智能体中心</h2>
+                <p>大模型Agent驱动 · 从被动响应到主动预防</p>
+            </div>
+            <div class="ai-stats">
+                <div class="ai-stat-item"><div class="number">94.2%</div><div class="label">风险预测准确率</div></div>
+                <div class="ai-stat-item"><div class="number">85%</div><div class="label">诊断置信度</div></div>
+                <div class="ai-stat-item"><div class="number">72h</div><div class="label">提前预警时间</div></div>
+                <div class="ai-stat-item"><div class="number">0</div><div class="label">漏报次数</div></div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <a href="ai-risk-warning.html" class="card">
+                <div class="card-icon ai-blue"><i class="fas fa-shield-alt"></i></div>
+                <h3>AI健康风险预警</h3>
+                <p>基于多维度数据分析，提前预测健康风险，行为异常检测</p>
+                <span class="ai-badge"><i class="fas fa-brain"></i> AI Agent</span>
+            </a>
+            <a href="ai-diagnosis.html" class="card">
+                <div class="card-icon ai-purple"><i class="fas fa-stethoscope"></i></div>
+                <h3>AI辅助诊断</h3>
+                <p>输入异常数据，AI给出病因分析、处置建议、用药建议</p>
+                <span class="ai-badge"><i class="fas fa-brain"></i> AI Agent</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p><i class="fas fa-info-circle"></i> 点击卡片进入对应页面 | 当前角色：医生</p>
+        </div>
+    </div>
+</body>
+</html>
